@@ -46,6 +46,9 @@ outputs:
     description: "Contract score out of 100."
     value: ${{ steps.check.outputs.score }}
 
+# Consumers must grant pull-requests: write when `comment-on-pr` is enabled.
+# This declaration documents the minimum required permission in one place.
+
 runs:
   using: "composite"
   steps:

@@ -1,0 +1,9 @@
+- id: infra-contract
+  name: infra-contract validation
+  description: Validate Terraform/OpenTofu changes against infra-contract.yaml.
+  entry: infra-contract check
+  language: python
+  additional_dependencies: ["."]
+  pass_filenames: false
+  require_serial: true
+  stages: [pre-commit]
