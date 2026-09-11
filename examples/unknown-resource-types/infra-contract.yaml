@@ -1,0 +1,13 @@
+version: "1"
+project:
+  name: unknown-resource-types
+cloud:
+  provider: aws
+  regions: [eu-central-1]
+security:
+  iam:
+    wildcard_permissions: forbidden
+ci:
+  fail_on: [high, critical]
+agent:
+  production_apply: false

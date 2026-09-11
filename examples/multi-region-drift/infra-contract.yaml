@@ -1,0 +1,13 @@
+version: "1"
+project:
+  name: multi-region-drift
+cloud:
+  provider: aws
+  regions: [eu-central-1]
+architecture:
+  compute:
+    allowed: [lambda, ecs]
+ci:
+  fail_on: [medium, high, critical]
+agent:
+  production_apply: false

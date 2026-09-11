@@ -149,6 +149,12 @@ use), [explain-and-fix](examples/explain-and-fix) (`explain`/`fix` commands),
 Action in your own repo), [docker](examples/docker), and
 [mcp-client](examples/mcp-client).
 
+Edge cases worth knowing about before you rely on this tool in CI:
+[multi-region-drift](examples/multi-region-drift) (a resource silently
+created outside the approved `cloud.regions` list) and
+[unknown-resource-types](examples/unknown-resource-types) (a plan mixing
+modeled resources with types the tool has no opinion on).
+
 ## Interfaces
 
 ### CLI
@@ -217,7 +223,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - uses: khaleddeissa/infra-contract@v0.1.2
+      - uses: khaleddeissa/infra-contract@v0.1.3
         with:
           plan: tfplan.json
           fail-on: high
@@ -237,8 +243,8 @@ healthcheck.
 Pull the published image (built and pushed on every tagged release):
 
 ```bash
-docker pull ghcr.io/khaleddeissa/infra-contract:v0.1.2
-docker run --rm -v "$PWD:/workspace:ro" -w /workspace ghcr.io/khaleddeissa/infra-contract:v0.1.2 \
+docker pull ghcr.io/khaleddeissa/infra-contract:v0.1.3
+docker run --rm -v "$PWD:/workspace:ro" -w /workspace ghcr.io/khaleddeissa/infra-contract:v0.1.3 \
   check --contract examples/rag-app/infra-contract.yaml examples/rag-app
 ```
 
