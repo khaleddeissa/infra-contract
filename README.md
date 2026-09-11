@@ -1,10 +1,20 @@
 # infra-contract
 
-> Version-controlled infrastructure rules for people, CI, and AI agents.
+<p align="center">
+  <img src="assets/logo.svg" alt="infra-contract logo" height="140">
+</p>
 
-`infra-contract` evaluates Terraform/OpenTofu infrastructure against a small,
-reviewable YAML contract. It gives humans and agents the same answer before a
-change is merged or deployed.
+<h1 align="center">infra-contract</h1>
+
+<p align="center">
+  Version-controlled infrastructure rules for people, CI, and AI agents.
+</p>
+
+<p align="center">
+  <code>infra-contract</code> evaluates Terraform/OpenTofu infrastructure against a small,
+  reviewable YAML contract. It gives humans and agents the same answer before a change is
+  merged or deployed.
+</p>
 
 [![CI](https://github.com/khaleddeissa/infra-contract/actions/workflows/ci.yml/badge.svg?branch=main&style=for-the-badge)](https://github.com/khaleddeissa/infra-contract/actions/workflows/ci.yml)
 [![Security](https://img.shields.io/badge/Security-CodeQL%20%26%20Dependency%20Review-2EA44F?style=for-the-badge&logo=github&logoColor=white)](https://github.com/khaleddeissa/infra-contract/actions/workflows/security.yml)
@@ -40,6 +50,11 @@ explicit, machine-readable, and independently enforced.
         \               /
          +-- deployment decision --+
 ```
+
+## Flow
+
+<img width="12388" height="2146" alt="Infra_Contract_Flow" src="https://github.com/user-attachments/assets/74639675-5eb3-47f3-9c61-eb3221c32f9b" />
+
 
 ## Features
 
