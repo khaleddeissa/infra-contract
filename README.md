@@ -26,7 +26,9 @@
 [![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://docs.docker.com/compose/)
 [![License](https://img.shields.io/badge/License-Apache--2.0-0D75B8?style=for-the-badge)](LICENSE)
 
-## Why
+## Architecture
+
+<img width="5971" height="3334" alt="Infra_Contract_Flow" src="https://github.com/user-attachments/assets/174a1715-e8f5-43ce-a81d-27d26bb48de1" />
 
 Valid Terraform can still create public databases, overly broad IAM policies,
 unsupported architecture, or risky destructive changes. That gap becomes more
@@ -50,11 +52,6 @@ explicit, machine-readable, and independently enforced.
         \               /
          +-- deployment decision --+
 ```
-
-## Flow
-
-<img width="12388" height="2146" alt="Infra_Contract_Flow" src="https://github.com/user-attachments/assets/74639675-5eb3-47f3-9c61-eb3221c32f9b" />
-
 
 ## Features
 
