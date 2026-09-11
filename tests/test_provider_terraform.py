@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from infra_contract.ir.model import ChangeAction, ResourceKind
-from infra_contract.providers.terraform.provider import TerraformProvider
+from ir.model import ChangeAction, ResourceKind
+from providers.terraform.provider import TerraformProvider
 
 FIXTURE = Path(__file__).parent / "fixtures" / "sample_plan.json"
 

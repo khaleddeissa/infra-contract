@@ -2,9 +2,9 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from infra_contract.contracts.models import Contract, ProjectConfig
-from infra_contract.engine.evaluator import Evaluator
-from infra_contract.providers.terraform.provider import TerraformProvider
+from contracts.models import Contract, ProjectConfig
+from engine.evaluator import Evaluator
+from providers.terraform.provider import TerraformProvider
 
 FIXTURE = Path(__file__).parent / "fixtures" / "sample_plan.json"
 
