@@ -16,23 +16,50 @@ dependencies = [
 [project.optional-dependencies]
 dev = [
     "pytest>=8.0",
-    "ruff>=0.4",
+    "black>=24.4",
+    "isort>=5.13",
     "mypy>=1.9",
+    "pre-commit>=3.7",
+    "types-PyYAML>=6.0",
 ]
 
 [project.scripts]
-infra-contract = "infra_contract.cli.main:app"
+infra-contract = "cli.main:app"
 
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/infra_contract"]
+packages = [
+    "src/ai",
+    "src/cli",
+    "src/contracts",
+    "src/engine",
+    "src/ir",
+    "src/mcp",
+    "src/policies",
+    "src/providers",
+]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["src"]
 
-[tool.ruff]
+[tool.black]
 line-length = 100
+target-version = ["py310"]
+
+[tool.isort]
+profile = "black"
+line_length = 100
+known_first_party = ["ai", "cli", "contracts", "engine", "ir", "mcp", "policies", "providers"]
+
+[tool.mypy]
+python_version = "3.10"
+mypy_path = "src"
+explicit_package_bases = true
+files = ["src/ai", "src/cli", "src/contracts", "src/engine", "src/ir", "src/mcp", "src/policies", "src/providers"]
+check_untyped_defs = true
+disallow_untyped_defs = true
+warn_unused_ignores = true
