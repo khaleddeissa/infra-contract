@@ -1,0 +1,34 @@
+version: "1"
+project:
+  name: human-approval-demo
+environment:
+  type: production
+cloud:
+  provider: aws
+  regions: [eu-central-1, eu-west-1]
+architecture:
+  compute:
+    allowed: [ecs]
+  database:
+    allowed: [rds-postgres]
+security:
+  database:
+    public_access: false
+    encryption: required
+  iam:
+    wildcard_permissions: forbidden
+networking:
+  database:
+    public_subnet: forbidden
+    private_subnet_required: true
+reliability:
+  production:
+    backups: required
+    multi_az: required
+    deletion_protection: required
+ci:
+  fail_on: [high, critical]
+agent:
+  production_apply: false
+  destructive_changes:
+    require_human_approval: true

@@ -1,7 +1,7 @@
 # infra-contract
 
 <p align="center">
-  <img src="assets/logo.svg" alt="infra-contract logo" height="140">
+  <img src="https://raw.githubusercontent.com/khaleddeissa/infra-contract/main/assets/logo.svg" alt="infra-contract logo" height="140">
 </p>
 
 <h1 align="center">infra-contract</h1>
@@ -28,7 +28,7 @@
 
 ## Architecture
 
-<img width="5971" height="3334" alt="Infra_Contract_Flow" src="https://github.com/user-attachments/assets/174a1715-e8f5-43ce-a81d-27d26bb48de1" />
+<img alt="Infra_Contract_Flow" src="https://github.com/user-attachments/assets/174a1715-e8f5-43ce-a81d-27d26bb48de1" width="900">
 
 Valid Terraform can still create public databases, overly broad IAM policies,
 unsupported architecture, or risky destructive changes. That gap becomes more
