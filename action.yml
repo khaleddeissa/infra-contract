@@ -4,7 +4,6 @@ description: >
   infra-contract.yaml, and fail the workflow on violations at or above a
   configured severity.
 author: "infra-contract"
-
 branding:
   icon: "shield"
   color: "blue"
@@ -53,7 +52,7 @@ runs:
   using: "composite"
   steps:
     - name: Set up Python
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@v7
       with:
         python-version: "3.12"
 
@@ -89,14 +88,14 @@ runs:
 
     - name: Upload results
       if: always()
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: infra-contract-results
         path: ${{ inputs.working-directory }}/infra-contract-results.json
 
     - name: Comment on pull request
       if: always() && inputs.comment-on-pr == 'true' && github.event_name == 'pull_request'
-      uses: actions/github-script@v7
+      uses: actions/github-script@v9
       with:
         script: |
           const fs = require('fs');
