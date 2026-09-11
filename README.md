@@ -223,7 +223,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - uses: khaleddeissa/infra-contract@v0.1.2
+      - uses: khaleddeissa/infra-contract@v0.1.3
         with:
           plan: tfplan.json
           fail-on: high
@@ -243,8 +243,8 @@ healthcheck.
 Pull the published image (built and pushed on every tagged release):
 
 ```bash
-docker pull ghcr.io/khaleddeissa/infra-contract:v0.1.2
-docker run --rm -v "$PWD:/workspace:ro" -w /workspace ghcr.io/khaleddeissa/infra-contract:v0.1.2 \
+docker pull ghcr.io/khaleddeissa/infra-contract:v0.1.3
+docker run --rm -v "$PWD:/workspace:ro" -w /workspace ghcr.io/khaleddeissa/infra-contract:v0.1.3 \
   check --contract examples/rag-app/infra-contract.yaml examples/rag-app
 ```
 
