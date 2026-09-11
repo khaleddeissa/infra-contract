@@ -1,0 +1,51 @@
+version: "1"
+
+project:
+  name: my-rag-app
+
+cloud:
+  provider: aws
+  regions: [eu-central-1]
+
+architecture:
+  compute:
+    allowed: [ecs]
+  database:
+    allowed: [rds-postgres]
+  cache:
+    allowed: [elasticache-redis]
+
+security:
+  database:
+    public_access: false
+    encryption: required
+  storage:
+    public_access: false
+    encryption: required
+  iam:
+    wildcard_permissions: forbidden
+
+networking:
+  database:
+    private_subnet_required: true
+
+reliability:
+  production:
+    backups: required
+    multi_az: required
+
+observability:
+  logs: true
+  metrics: true
+  tracing: true
+
+cost:
+  monthly_budget_usd: 500
+
+agent:
+  production_apply: false
+  destructive_changes:
+    require_human_approval: true
+
+ci:
+  fail_on: [critical, high]
