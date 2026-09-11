@@ -31,14 +31,14 @@ jobs:
       - name: Install dependencies
         run: uv sync --all-extras
 
-      - name: Lint (ruff)
-        run: uv run ruff check src tests
+      - name: Check import order (isort)
+        run: uv run isort --check-only src tests
 
-      - name: Format check (ruff)
-        run: uv run ruff format --check src tests
+      - name: Check formatting (Black)
+        run: uv run black --check src tests
 
       - name: Type check (mypy)
-        run: uv run mypy src
+        run: uv run mypy
 
       - name: Test (pytest)
         run: uv run pytest -v
