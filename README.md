@@ -51,6 +51,11 @@ explicit, machine-readable, and independently enforced.
          +-- deployment decision --+
 ```
 
+## Flow
+
+<img width="12388" height="2146" alt="Infra_Contract_Flow" src="https://github.com/user-attachments/assets/74639675-5eb3-47f3-9c61-eb3221c32f9b" />
+
+
 ## Features
 
 - YAML contracts validated with Pydantic.
