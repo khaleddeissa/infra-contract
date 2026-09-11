@@ -1,163 +1,103 @@
 # infra-contract
 
-Infrastructure contracts for humans and AI agents.
+> Version-controlled infrastructure rules for people, CI, and AI agents.
 
-Define what your infrastructure is allowed to do. Validate every
-infrastructure change — human-written or AI-generated — against it.
+`infra-contract` evaluates Terraform/OpenTofu infrastructure against a small,
+reviewable YAML contract. It gives humans and agents the same answer before a
+change is merged or deployed.
 
-```
-                    Developer
-                        │
-                    AI Agent
-                        │
-                        ↓
-               ┌─────────────────┐
-               │  infra-contract │
-               │                 │
-               │ Architecture    │
-               │ Security        │
-               │ Cost            │
-               │ Reliability     │
-               │ Observability   │
-               │ Agent Rules     │
-               └─────────────────┘
-                        │
-                        ↓
-                Infrastructure
-                        │
-                        ↓
-                    Production
-```
+[![CI](https://github.com/khaleddeissa/infra-contract/actions/workflows/ci.yml/badge.svg?branch=main&style=for-the-badge)](https://github.com/khaleddeissa/infra-contract/actions/workflows/ci.yml)
+[![Security](https://img.shields.io/badge/Security-CodeQL%20%26%20Dependency%20Review-2EA44F?style=for-the-badge&logo=github&logoColor=white)](https://github.com/khaleddeissa/infra-contract/actions/workflows/security.yml)
+[![Latest release](https://img.shields.io/github/v/release/khaleddeissa/infra-contract?display_name=tag&sort=semver&style=for-the-badge)](https://github.com/khaleddeissa/infra-contract/releases)
+[![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/downloads/)
+[![Pydantic](https://img.shields.io/badge/Pydantic-v2-E92063?style=for-the-badge&logo=pydantic&logoColor=white)](https://docs.pydantic.dev/)
+[![Terraform](https://img.shields.io/badge/Terraform%20%2F%20OpenTofu-Plan%20Validation-7B42BC?style=for-the-badge&logo=terraform&logoColor=white)](https://developer.hashicorp.com/terraform)
+[![MCP](https://img.shields.io/badge/Model%20Context%20Protocol-MCP-000000?style=for-the-badge&logo=anthropic&logoColor=white)](https://modelcontextprotocol.io/)
+[![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://docs.docker.com/compose/)
+[![License](https://img.shields.io/badge/License-Apache--2.0-0D75B8?style=for-the-badge)](LICENSE)
 
 ## Why
 
-Infrastructure can be syntactically valid, deployable, and technically
-functional while still violating the architecture, security, cost,
-reliability, or operational requirements of a project. This gets worse as
-AI coding agents increasingly generate Terraform, IAM, and cloud
-infrastructure directly.
+Valid Terraform can still create public databases, overly broad IAM policies,
+unsupported architecture, or risky destructive changes. That gap becomes more
+important when AI agents generate infrastructure. This project makes the rules
+explicit, machine-readable, and independently enforced.
 
-`infra-contract` gives developers, CI, and AI agents one version-controlled,
-machine-readable contract to check against — instead of asking an agent to
-infer an organization's infrastructure rules from scratch.
-
-## Architecture
-
-The engine is built around one dependency direction. Everything downstream
-only ever talks to the engine — never to each other.
-
-```
-                ┌─────────────────┐
-                │ Contract Models │   (contracts/)
-                └────────┬────────┘
-                         ↓
-                ┌─────────────────┐
-                │ Policy Engine   │   (engine/, policies/)
-                └────────┬────────┘
-                         ↓
-                ┌─────────────────┐
-                │ Normalized IR   │   (ir/)
-                └────────┬────────┘
-                         ↑
-             ┌───────────┼───────────┐
-             │           │           │
-         Terraform      AWS      Kubernetes   (providers/, v2+)
-             │
-             ↓
-      ┌────────────────┐
-      │ CLI / MCP / CI │
-      └────────────────┘
+```text
+    Developer or AI agent
+             |
+             v
+    Terraform / OpenTofu change
+             |
+             v
+    +------------------------+
+    |  infra-contract.yaml   |
+    |  policy engine         |
+    +------------------------+
+        |               |
+        v               v
+    CLI / MCP          CI gate
+        \               /
+         +-- deployment decision --+
 ```
 
-* **Contract Models** (`contracts/models.py`) are the only schema every other
-  layer is allowed to depend on. Pydantic-validated, versioned, YAML-first.
-* **Policy Engine** (`engine/evaluator.py`, `policies/`) evaluates a
-  `Contract` against a normalized document. Policies never import a
-  provider — they only see `ir.model.Resource`.
-* **Normalized IR** (`ir/model.py`) is what makes multi-provider support
-  practical: a Terraform `aws_db_instance`, a future Kubernetes
-  `StatefulSet`, or a live AWS API scan all become the same `Resource`
-  shape before a policy ever looks at them.
-* **Providers** (`providers/terraform/`) are the only code that understands
-  a native format (Terraform plan JSON in V1). They translate into IR and
-  know nothing about policies.
-* **CLI, MCP, GitHub Action** are thin consumers. They format and transport;
-  they never re-implement evaluation. `infra-contract check`,
-  `infra_contract_check_plan` (MCP), and the GitHub Action all call the
-  exact same `Evaluator.run()`.
+## Features
 
-This is enforced, not just described: see `tests/test_architecture.py`,
-which fails the build if `contracts/` or `engine/` ever import from
-`providers/`, `cli/`, or `mcp/`.
+- YAML contracts validated with Pydantic.
+- Terraform/OpenTofu plan parsing, plus a lower-confidence source scan.
+- Built-in security, networking, reliability, and architecture policies.
+- CLI, Python API, MCP server, and a reusable GitHub Action using one engine.
+- Change-risk reporting and optional human approval for destructive stateful changes.
+- JSON output suitable for CI and agent tooling.
 
 ## Install
+
+Requires Python 3.10+.
 
 ```bash
 uv tool install infra-contract
 # or
 pip install infra-contract
-# or, project-local
-uvx infra-contract init
 ```
 
-## Quickstart
+To work from a checkout:
 
 ```bash
-cd my-project
-infra-contract init      # detects your stack, writes infra-contract.yaml,
-                          # AGENTS.md / CLAUDE.md, and a GitHub Actions workflow
-infra-contract check     # validates .tf source (best-effort, no plan needed)
+uv sync --all-extras
+uv run infra-contract --help
 ```
 
-For higher-confidence validation against what will actually be deployed:
+## Quick start
+
+Initialize a repository, then review the generated contract before relying on it.
+
+```bash
+cd my-infrastructure-repository
+infra-contract init
+infra-contract check
+```
+
+Use an actual plan for the highest-confidence validation:
 
 ```bash
 terraform plan -out=tfplan
 terraform show -json tfplan > tfplan.json
 infra-contract check --plan tfplan.json
-infra-contract plan tfplan.json      # + change-risk analysis
-infra-contract explain               # human-readable remediation
+infra-contract plan tfplan.json
 ```
 
-Machine-readable output for CI/automation:
+For scripts and CI, use JSON and set the blocking severity explicitly:
 
 ```bash
-infra-contract check --format json --fail-on high
+infra-contract check --plan tfplan.json --format json --fail-on high
 ```
 
-## AI agent integration
-
-`infra-contract init` generates `AGENTS.md` / `CLAUDE.md` so any coding
-agent gets explicit infrastructure rules as context instead of guessing.
-
-An MCP server exposes the same engine as first-class tools:
-
-```bash
-infra-contract mcp
-```
-
-```
-AI Agent: "I want to add a public S3 bucket."
-      ↓
-MCP → infra_contract_validate_change
-      ↓
-infra-contract engine → Contract evaluation
-      ↓
-DENIED — "Production object storage must not be publicly accessible."
-```
-
-The separation this creates is the point: **AI reasoning ≠ infrastructure
-authority.** The agent can propose. The contract — evaluated independently,
-outside the agent's own reasoning — determines whether the proposal
-conforms. The same check runs again in CI on the final Terraform, so the
-agent's own self-check can never be the only gate.
-
-## Example contract
+## Contract reference
 
 ```yaml
 version: "1"
 project:
-  name: my-rag-app
+  name: my-service
 cloud:
   provider: aws
   regions: [eu-central-1]
@@ -180,23 +120,186 @@ agent:
   production_apply: false
   destructive_changes:
     require_human_approval: true
+ci:
+  fail_on: [high, critical]
 ```
 
-## What this is not
+See [basic-terraform](examples/basic-terraform),
+[production-service](examples/production-service), and
+[rag-app](examples/rag-app) for complete starting points.
 
-`infra-contract` is not a Terraform replacement, a cloud provider, a
-deployment platform, or an AI coding agent. It is a contract and validation
-layer sitting between infrastructure code / AI agents and deployment.
+## Interfaces
+
+### CLI
+
+```bash
+infra-contract init [PROJECT_ROOT]
+infra-contract check [TARGET] [--contract PATH] [--plan PLAN.json] [--format text|json]
+infra-contract plan PLAN.json [--contract PATH]
+infra-contract diff PLAN.json [--contract PATH]
+infra-contract explain [--resource RESOURCE_ID] [--plan PLAN.json]
+infra-contract fix [TARGET] [--plan PLAN.json]
+infra-contract mcp [--contract PATH]
+```
+
+`check` returns exit code `1` for blocking findings. `plan` also reports risk;
+a deletion or replacement of a database, cache, or storage resource is critical
+when the contract requires human approval. `fix` only proposes changes—it never
+modifies infrastructure.
+
+### Python
+
+The flattened source layout intentionally exposes reusable packages directly:
+
+```python
+from contracts import Contract, load_contract
+from engine import Evaluator
+from providers import TerraformProvider
+
+contract = load_contract("infra-contract.yaml")
+document = TerraformProvider().load("tfplan.json")
+result = Evaluator().run(document, contract)
+print(result.to_dict())
+```
+
+Public API packages are `ai`, `cli`, `contracts`, `engine`, `ir`, `mcp`,
+`policies`, and `providers`. Their `__init__.py` files expose the intended
+reusable symbols; import implementation modules only when you need a
+specialized type.
+
+### MCP for AI agents
+
+Run the server over stdio:
+
+```bash
+infra-contract mcp --contract infra-contract.yaml
+```
+
+The server offers contract discovery, policy lookup, source/plan validation,
+violation explanation, single-resource preflight checks, and change-risk
+analysis. It does not apply infrastructure. See [the MCP example](examples/mcp-client).
+
+### GitHub Actions
+
+The repository itself is a composite action. Pin a tag or commit SHA in a
+consumer workflow:
+
+```yaml
+name: Infrastructure contract
+on: [pull_request]
+permissions:
+  contents: read
+  pull-requests: write # only needed when comment-on-pr is true
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: OWNER/infra-contract@v0.1.0
+        with:
+          plan: tfplan.json
+          fail-on: high
+          comment-on-pr: true
+```
+
+The generated workflow from `infra-contract init` is a simple CLI-based
+alternative. This repository also includes CI, dependency review, and CodeQL
+workflows.
+
+## Docker and Compose
+
+The image is a multi-stage build, uses a locked `uv` environment, and runs as a
+non-root user. It is intentionally a CLI image, so it has no HTTP port or
+healthcheck.
+
+```bash
+docker build -t infra-contract:local .
+docker run --rm -v "$PWD:/workspace:ro" -w /workspace infra-contract:local \
+  check --contract examples/rag-app/infra-contract.yaml examples/rag-app
+
+docker compose build
+docker compose run --rm infra-contract check \
+  --contract examples/production-service/infra-contract.yaml path/to/terraform
+```
 
 ## Development
 
 ```bash
-uv sync
-uv run pytest
-uv run ruff check .
-uv run mypy .
+uv sync --all-extras
+uv run isort --check-only src tests
+uv run black --check src tests
+uv run mypy src
+uv run pytest -v
 ```
+
+Apply local formatting with `uv run isort src tests` and `uv run black src tests`.
+The project intentionally uses Black and isort rather than Ruff for formatting
+and import ordering.
+
+Convenience targets mirror CI:
+
+```bash
+make install
+make check
+make ci
+make hooks-install
+```
+
+The pre-commit hook checks file hygiene, YAML/TOML, import ordering, and Black
+on commits; mypy and pytest run on push. The included `.pre-commit-hooks.yaml`
+also lets downstream repositories install `infra-contract check` as a reusable
+hook.
+
+## Repository layout
+
+```text
+src/
+├── contracts/  # YAML schema and loader
+├── ir/         # provider-neutral infrastructure model
+├── policies/   # policy primitives and built-in rules
+├── engine/     # evaluation, scoring, risk
+├── providers/  # Terraform/OpenTofu adapters
+├── cli/        # Typer commands
+├── mcp/        # MCP server
+└── ai/         # generated agent instructions
+```
+
+The dependency flow is one way: providers normalize into `ir`; policies and the
+engine evaluate `contracts` plus `ir`; CLI/MCP/action only transport results.
+Architecture tests prevent core packages from importing interface layers.
+
+## Security and release
+
+GitHub Actions runs tests, Black, isort, mypy, package builds, dependency review
+on pull requests, and scheduled CodeQL analysis. Enable Dependabot and GitHub
+Advanced Security features in repository settings where available.
+
+To publish the GitHub Action in Marketplace, first create a versioned release:
+
+1. Confirm CI is green and update the version/changelog as appropriate.
+2. Create and push an annotated tag such as `v0.1.0`; the release workflow builds
+   and publishes the Python package if PyPI Trusted Publishing is configured.
+3. Open GitHub **Releases** → **Draft a new release**, choose that tag, add release
+   notes, and publish it.
+4. GitHub will then offer Marketplace publication. Review the listing metadata,
+   confirm the action is safe for public use, and publish the listing.
+
+Do not click “Draft a release” until the tag/version and PyPI trusted-publisher
+configuration are ready. Marketplace publication is optional; users can always
+reference `OWNER/infra-contract@v0.1.0` directly.
+
+`Dockerfile.goreleaser` is intentionally not included. GoReleaser builds and
+releases Go programs; this project publishes a Python package and a Docker CLI
+image through `uv` and the existing release workflow.
+
+## Scope
+
+`infra-contract` is a validation layer, not Terraform, a cloud deployment
+platform, or an autonomous apply tool. Policies only cover modeled resource types;
+an unknown resource produces no opinion, so pair this with cloud-native controls
+and code review.
 
 ## License
 
-Apache-2.0
+[Apache-2.0](LICENSE)
