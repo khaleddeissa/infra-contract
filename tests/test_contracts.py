@@ -2,21 +2,19 @@ from __future__ import annotations
 
 import pytest
 
-from infra_contract.contracts.loader import ContractLoadError, load_contract
+from contracts.loader import ContractLoadError, load_contract
 
 
 def test_load_valid_contract(tmp_path):
     contract_yaml = tmp_path / "infra-contract.yaml"
-    contract_yaml.write_text(
-        """
+    contract_yaml.write_text("""
 version: "1"
 project:
   name: demo
 security:
   database:
     public_access: false
-"""
-    )
+""")
     contract = load_contract(contract_yaml)
     assert contract.project.name == "demo"
     assert contract.security.database.public_access is False

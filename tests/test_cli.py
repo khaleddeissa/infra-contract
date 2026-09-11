@@ -4,7 +4,7 @@ from pathlib import Path
 
 from typer.testing import CliRunner
 
-from infra_contract.cli.main import app
+from cli.main import app
 
 runner = CliRunner()
 FIXTURE = Path(__file__).parent / "fixtures" / "sample_plan.json"
@@ -53,8 +53,7 @@ def test_check_json_output_is_valid_json(tmp_path):
 def test_plan_blocks_on_destructive_change(tmp_path):
     runner.invoke(app, ["init", str(tmp_path)])
     destructive_plan = tmp_path / "destroy.json"
-    destructive_plan.write_text(
-        """
+    destructive_plan.write_text("""
 {
   "resource_changes": [
     {
@@ -64,8 +63,7 @@ def test_plan_blocks_on_destructive_change(tmp_path):
     }
   ]
 }
-"""
-    )
+""")
     result = runner.invoke(
         app,
         ["plan", str(destructive_plan), "--contract", str(tmp_path / "infra-contract.yaml")],

@@ -3,16 +3,16 @@ from __future__ import annotations
 import ast
 from pathlib import Path
 
-SRC = Path(__file__).parent.parent / "src" / "infra_contract"
+SRC = Path(__file__).parent.parent / "src"
 
 # Modules that must stay provider- and interface-agnostic.
 CORE_PACKAGES = ["contracts", "engine", "policies", "ir"]
 
 # These are the only outward-facing layers allowed to import providers/cli/mcp.
 FORBIDDEN_IMPORT_PREFIXES = (
-    "infra_contract.providers",
-    "infra_contract.cli",
-    "infra_contract.mcp",
+    "providers",
+    "cli",
+    "mcp",
 )
 
 
@@ -49,6 +49,6 @@ def test_ir_does_not_import_contracts_or_engine():
     violations = []
     for py_file in (SRC / "ir").rglob("*.py"):
         for module in _imported_modules(py_file):
-            if module.startswith(("infra_contract.contracts", "infra_contract.engine")):
+            if module.startswith(("contracts", "engine")):
                 violations.append(f"{py_file.relative_to(SRC)} imports {module}")
     assert not violations, "\n".join(violations)

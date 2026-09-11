@@ -1,0 +1,17 @@
+version: "1"
+project:
+  name: basic-terraform
+cloud:
+  provider: aws
+  regions: [eu-central-1]
+architecture:
+  compute:
+    allowed: [lambda]
+  storage:
+    allowed: [s3]
+security:
+  storage:
+    public_access: false
+    encryption: required
+agent:
+  production_apply: false
