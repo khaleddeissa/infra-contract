@@ -32,21 +32,15 @@ def test_public_database_is_critical_and_fails():
 def test_wildcard_iam_detected():
     contract = _contract()
     result = Evaluator().run(_document(), contract)
-    assert any(
-        f.rule == "security.no-wildcard-iam" and not f.passed for f in result.findings
-    )
+    assert any(f.rule == "security.no-wildcard-iam" and not f.passed for f in result.findings)
 
 
 def test_approved_ecs_compute_passes():
     contract = _contract()
     contract.architecture.compute.allowed = ["ecs"]
     result = Evaluator().run(_document(), contract)
-    ecs_findings = [
-        f for f in result.findings if f.resource_id == "aws_ecs_service.api"
-    ]
-    assert all(
-        f.passed for f in ecs_findings if f.rule == "architecture.approved-compute-only"
-    )
+    ecs_findings = [f for f in result.findings if f.resource_id == "aws_ecs_service.api"]
+    assert all(f.passed for f in ecs_findings if f.rule == "architecture.approved-compute-only")
 
 
 def test_score_never_masks_critical_findings():
@@ -104,9 +98,7 @@ def test_resource_in_disallowed_region_is_flagged():
     result = Evaluator().run(document, contract)
 
     region_findings = {
-        f.resource_id: f
-        for f in result.findings
-        if f.rule == "architecture.approved-region-only"
+        f.resource_id: f for f in result.findings if f.rule == "architecture.approved-region-only"
     }
     assert region_findings["aws_lambda_function.drifted"].passed is False
     assert "aws_lambda_function.unregioned" not in region_findings
@@ -149,9 +141,7 @@ def test_unmodeled_resources_do_not_dilute_or_block_evaluation():
     result = Evaluator().run(document, contract)
 
     assert len(document.resources) == 1  # only the IAM policy was modeled
-    assert any(
-        f.rule == "security.no-wildcard-iam" and not f.passed for f in result.findings
-    )
+    assert any(f.rule == "security.no-wildcard-iam" and not f.passed for f in result.findings)
     assert not any(
         f.resource_id in ("aws_cloudfront_distribution.cdn", "aws_sqs_queue.jobs")
         for f in result.findings

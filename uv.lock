@@ -460,7 +460,7 @@ wheels = [
 
 [[package]]
 name = "infra-contract"
-version = "0.1.0"
+version = "0.1.2"
 source = { editable = "." }
 dependencies = [
     { name = "mcp" },
@@ -484,7 +484,7 @@ dev = [
 requires-dist = [
     { name = "black", marker = "extra == 'dev'", specifier = ">=24.4" },
     { name = "isort", marker = "extra == 'dev'", specifier = ">=5.13" },
-    { name = "mcp", specifier = ">=1.2.0,<2" },
+    { name = "mcp", specifier = ">=1.2.0,<3" },
     { name = "mypy", marker = "extra == 'dev'", specifier = ">=1.9" },
     { name = "pre-commit", marker = "extra == 'dev'", specifier = ">=3.7" },
     { name = "pydantic", specifier = ">=2.6" },
