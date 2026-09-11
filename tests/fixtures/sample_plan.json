@@ -1,0 +1,39 @@
+{
+  "format_version": "1.2",
+  "resource_changes": [
+    {
+      "address": "aws_db_instance.production",
+      "type": "aws_db_instance",
+      "change": {
+        "actions": ["create"],
+        "after": {
+          "engine": "postgres",
+          "region": "eu-central-1",
+          "publicly_accessible": true,
+          "storage_encrypted": true,
+          "backup_retention_period": 7,
+          "multi_az": false,
+          "tags": {"Environment": "production"}
+        }
+      }
+    },
+    {
+      "address": "aws_iam_policy.application",
+      "type": "aws_iam_policy",
+      "change": {
+        "actions": ["create"],
+        "after": {
+          "policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Action\":\"*\",\"Resource\":\"*\"}]}"
+        }
+      }
+    },
+    {
+      "address": "aws_ecs_service.api",
+      "type": "aws_ecs_service",
+      "change": {
+        "actions": ["create"],
+        "after": {"region": "eu-central-1", "tags": {"Environment": "production"}}
+      }
+    }
+  ]
+}
