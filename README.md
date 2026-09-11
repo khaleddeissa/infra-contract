@@ -149,6 +149,12 @@ use), [explain-and-fix](examples/explain-and-fix) (`explain`/`fix` commands),
 Action in your own repo), [docker](examples/docker), and
 [mcp-client](examples/mcp-client).
 
+Edge cases worth knowing about before you rely on this tool in CI:
+[multi-region-drift](examples/multi-region-drift) (a resource silently
+created outside the approved `cloud.regions` list) and
+[unknown-resource-types](examples/unknown-resource-types) (a plan mixing
+modeled resources with types the tool has no opinion on).
+
 ## Interfaces
 
 ### CLI
