@@ -1,6 +1,6 @@
 name: "Infrastructure Contract"
 description: >
-  Validate Terraform/OpenTofu plans or source against infra-contract.yaml and fail on violations at or above a configured severity.
+  Validate Terraform/OpenTofu plans or source against infra-contract.yaml; fail on violations at or above configured severity.
 author: "infra-contract"
 branding:
   icon: "shield"
