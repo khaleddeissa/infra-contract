@@ -1,0 +1,11 @@
+services:
+  infra-contract:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: infra-contract:local
+    working_dir: /workspace
+    volumes:
+      - ./:/workspace:ro
+    # Example: docker compose run --rm infra-contract check --contract examples/rag-app/infra-contract.yaml examples/rag-app
+    command: ["--help"]
