@@ -41,12 +41,31 @@
   <!-- Center chip = "the contract" (dev/tool motif) -->
   <rect x="176" y="176" width="160" height="160" rx="24" fill="url(#chipGrad)"/>
 
-  <!-- Code brackets -->
-  <text x="199" y="292" font-family="'JetBrains Mono', 'Courier New', monospace"
-        font-size="92" font-weight="700" fill="#94A3B8">{</text>
-  <text x="277" y="292" font-family="'JetBrains Mono', 'Courier New', monospace"
-        font-size="92" font-weight="700" fill="#94A3B8">}</text>
+  <!-- Symmetrical code brackets -->
+  <g fill="none"
+    stroke="#94A3B8"
+    stroke-width="10"
+    stroke-linecap="round"
+    stroke-linejoin="round">
 
+    <!-- Left { -->
+    <path d="M220 205
+            C205 205 198 214 198 228
+            V246
+            C198 256 194 256 186 256
+            C194 256 198 256 198 266
+            V284
+            C198 298 205 307 220 307" />
+
+    <!-- Right } -->
+    <path d="M292 205
+            C307 205 314 214 314 228
+            V246
+            C314 256 318 256 326 256
+            C318 256 314 256 314 266
+            V284
+            C314 298 307 307 292 307" />
+  </g>
   <!-- Checkmark = "contract enforced" -->
   <circle cx="256" cy="256" r="34" fill="#22C55E"/>
   <path d="M238 256 L250 268 L276 240"
