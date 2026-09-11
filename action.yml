@@ -1,0 +1,150 @@
+name: "Infrastructure Contract"
+description: >
+  Validate infrastructure (Terraform/OpenTofu plans or source) against an
+  infra-contract.yaml, and fail the workflow on violations at or above a
+  configured severity.
+author: "infra-contract"
+
+branding:
+  icon: "shield"
+  color: "blue"
+
+inputs:
+  contract:
+    description: "Path to infra-contract.yaml, relative to working-directory."
+    required: false
+    default: "infra-contract.yaml"
+  plan:
+    description: >
+      Path to a `terraform show -json` plan file, relative to
+      working-directory. If omitted, falls back to a best-effort scan of
+      .tf source (lower confidence).
+    required: false
+    default: ""
+  target:
+    description: "Directory to scan when no plan is given."
+    required: false
+    default: "."
+  fail-on:
+    description: "Minimum severity that fails the workflow: info|warning|medium|high|critical."
+    required: false
+    default: "high"
+  working-directory:
+    description: "Directory to run in."
+    required: false
+    default: "."
+  comment-on-pr:
+    description: "Post a summary comment on the pull request."
+    required: false
+    default: "true"
+
+outputs:
+  status:
+    description: "'passed' or 'failed'"
+    value: ${{ steps.check.outputs.status }}
+  score:
+    description: "Contract score out of 100."
+    value: ${{ steps.check.outputs.score }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.12"
+
+    - name: Install infra-contract
+      shell: bash
+      # Installs from this action's own source so it works before the
+      # package is published to PyPI, and stays pinned to whatever ref
+      # consumers point `uses:` at afterwards.
+      run: pip install "${{ github.action_path }}"
+
+    - name: Run infra-contract check
+      id: check
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      run: |
+        set +e
+        ARGS=(check --contract "${{ inputs.contract }}" --format json --fail-on "${{ inputs.fail-on }}")
+        if [ -n "${{ inputs.plan }}" ]; then
+          ARGS+=(--plan "${{ inputs.plan }}")
+        else
+          ARGS+=("${{ inputs.target }}")
+        fi
+
+        infra-contract "${ARGS[@]}" | tee infra-contract-results.json
+        exit_code=${PIPESTATUS[0]}
+
+        status=$(python3 -c "import json;print(json.load(open('infra-contract-results.json'))['status'])")
+        score=$(python3 -c "import json;print(json.load(open('infra-contract-results.json'))['score'])")
+        echo "status=$status" >> "$GITHUB_OUTPUT"
+        echo "score=$score" >> "$GITHUB_OUTPUT"
+
+        exit $exit_code
+
+    - name: Upload results
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: infra-contract-results
+        path: ${{ inputs.working-directory }}/infra-contract-results.json
+
+    - name: Comment on pull request
+      if: always() && inputs.comment-on-pr == 'true' && github.event_name == 'pull_request'
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const fs = require('fs');
+          const path = require('path');
+          const resultsPath = path.join(
+            process.env.GITHUB_WORKSPACE,
+            '${{ inputs.working-directory }}',
+            'infra-contract-results.json'
+          );
+          const results = JSON.parse(fs.readFileSync(resultsPath, 'utf8'));
+
+          const icon = results.status === 'passed' ? '✅' : '❌';
+          const bySeverity = { critical: [], high: [], medium: [], warning: [] };
+          for (const v of results.violations || []) {
+            (bySeverity[v.severity] || bySeverity.warning).push(v);
+          }
+
+          let body = `## infra-contract\n\n${icon} Infrastructure Contract ${results.status === 'passed' ? 'Passed' : 'Failed'}\n\n`;
+          body += `Contract score: **${results.score}/100**\n\n`;
+
+          for (const [severity, items] of Object.entries(bySeverity)) {
+            if (items.length === 0) continue;
+            body += `### ${severity.toUpperCase()}\n\n`;
+            for (const v of items) {
+              body += `- \`${v.resource_id}\` — ${v.message} (\`${v.rule}\`)\n`;
+            }
+            body += `\n`;
+          }
+
+          const marker = '<!-- infra-contract-comment -->';
+          body = marker + '\n' + body;
+
+          const { data: comments } = await github.rest.issues.listComments({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            issue_number: context.issue.number,
+          });
+          const existing = comments.find(c => c.body && c.body.includes(marker));
+
+          if (existing) {
+            await github.rest.issues.updateComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              comment_id: existing.id,
+              body,
+            });
+          } else {
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body,
+            });
+          }
