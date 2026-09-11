@@ -4,7 +4,6 @@ description: >
   infra-contract.yaml, and fail the workflow on violations at or above a
   configured severity.
 author: "infra-contract"
-
 branding:
   icon: "shield"
   color: "blue"
