@@ -24,6 +24,7 @@
 [![Terraform](https://img.shields.io/badge/Terraform%20%2F%20OpenTofu-Plan%20Validation-7B42BC?style=for-the-badge&logo=terraform&logoColor=white)](https://developer.hashicorp.com/terraform)
 [![MCP](https://img.shields.io/badge/Model%20Context%20Protocol-MCP-000000?style=for-the-badge&logo=anthropic&logoColor=white)](https://modelcontextprotocol.io/)
 [![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://docs.docker.com/compose/)
+[![Marketplace](https://img.shields.io/badge/Marketplace-Infrastructure%20Contract-2088FF?style=for-the-badge&logo=github&logoColor=white)](https://github.com/marketplace/actions/infrastructure-contract)
 [![License](https://img.shields.io/badge/License-Apache--2.0-0D75B8?style=for-the-badge)](LICENSE)
 
 ## Architecture
@@ -137,8 +138,16 @@ ci:
 ```
 
 See [basic-terraform](examples/basic-terraform),
-[production-service](examples/production-service), and
-[rag-app](examples/rag-app) for complete starting points.
+[production-service](examples/production-service),
+[rag-app](examples/rag-app), and
+[quickstart-init](examples/quickstart-init) for complete starting points.
+
+Task-specific walkthroughs: [python-api](examples/python-api) (programmatic
+use), [explain-and-fix](examples/explain-and-fix) (`explain`/`fix` commands),
+[human-approval](examples/human-approval) (destructive-change gating),
+[github-actions-consumer](examples/github-actions-consumer) (wiring up the
+Action in your own repo), [docker](examples/docker), and
+[mcp-client](examples/mcp-client).
 
 ## Interfaces
 
@@ -207,8 +216,8 @@ jobs:
   validate:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: OWNER/infra-contract@v0.1.0
+      - uses: actions/checkout@v7
+      - uses: khaleddeissa/infra-contract@v0.1.2
         with:
           plan: tfplan.json
           fail-on: high
@@ -224,6 +233,16 @@ workflows.
 The image is a multi-stage build, uses a locked `uv` environment, and runs as a
 non-root user. It is intentionally a CLI image, so it has no HTTP port or
 healthcheck.
+
+Pull the published image (built and pushed on every tagged release):
+
+```bash
+docker pull ghcr.io/khaleddeissa/infra-contract:v0.1.2
+docker run --rm -v "$PWD:/workspace:ro" -w /workspace ghcr.io/khaleddeissa/infra-contract:v0.1.2 \
+  check --contract examples/rag-app/infra-contract.yaml examples/rag-app
+```
+
+Or build locally:
 
 ```bash
 docker build -t infra-contract:local .
@@ -280,30 +299,6 @@ src/
 The dependency flow is one way: providers normalize into `ir`; policies and the
 engine evaluate `contracts` plus `ir`; CLI/MCP/action only transport results.
 Architecture tests prevent core packages from importing interface layers.
-
-## Security and release
-
-GitHub Actions runs tests, Black, isort, mypy, package builds, dependency review
-on pull requests, and scheduled CodeQL analysis. Enable Dependabot and GitHub
-Advanced Security features in repository settings where available.
-
-To publish the GitHub Action in Marketplace, first create a versioned release:
-
-1. Confirm CI is green and update the version/changelog as appropriate.
-2. Create and push an annotated tag such as `v0.1.0`; the release workflow builds
-   and publishes the Python package if PyPI Trusted Publishing is configured.
-3. Open GitHub **Releases** → **Draft a new release**, choose that tag, add release
-   notes, and publish it.
-4. GitHub will then offer Marketplace publication. Review the listing metadata,
-   confirm the action is safe for public use, and publish the listing.
-
-Do not click “Draft a release” until the tag/version and PyPI trusted-publisher
-configuration are ready. Marketplace publication is optional; users can always
-reference `OWNER/infra-contract@v0.1.0` directly.
-
-`Dockerfile.goreleaser` is intentionally not included. GoReleaser builds and
-releases Go programs; this project publishes a Python package and a Docker CLI
-image through `uv` and the existing release workflow.
 
 ## Scope
 
