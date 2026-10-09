@@ -65,6 +65,8 @@ explicit, machine-readable, and independently enforced.
 
 ## Install
 
+This checkout targets **0.1.5**. Published packages and tags may lag this checkout.
+
 Requires Python 3.10+.
 
 ```bash
@@ -167,6 +169,7 @@ infra-contract diff PLAN.json [--contract PATH]
 infra-contract explain [--resource RESOURCE_ID] [--plan PLAN.json]
 infra-contract fix [TARGET] [--plan PLAN.json]
 infra-contract mcp [--contract PATH]
+infra-contract support
 ```
 
 `check` returns exit code `1` for blocking findings. `plan` also reports risk;
@@ -223,7 +226,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - uses: khaleddeissa/infra-contract@v0.1.3
+      - uses: khaleddeissa/infra-contract@v0.1.5
         with:
           plan: tfplan.json
           fail-on: high
@@ -243,8 +246,8 @@ healthcheck.
 Pull the published image (built and pushed on every tagged release):
 
 ```bash
-docker pull ghcr.io/khaleddeissa/infra-contract:v0.1.3
-docker run --rm -v "$PWD:/workspace:ro" -w /workspace ghcr.io/khaleddeissa/infra-contract:v0.1.3 \
+docker pull ghcr.io/khaleddeissa/infra-contract:v0.1.5
+docker run --rm -v "$PWD:/workspace:ro" -w /workspace ghcr.io/khaleddeissa/infra-contract:v0.1.5 \
   check --contract examples/rag-app/infra-contract.yaml examples/rag-app
 ```
 
@@ -315,4 +318,32 @@ and code review.
 
 ## License
 
-[Apache-2.0](LICENSE)
+Created by **Khaled Eissa**. Licensed under [Apache-2.0](LICENSE).
+
+## Support and feedback
+
+If infra-contract helps you, a [GitHub star](https://github.com/khaleddeissa/infra-contract)
+or [feedback](https://github.com/khaleddeissa/infra-contract/issues) would be much appreciated.
+
+Run `infra-contract support` to print the logo and repository links:
+
+```text
+        o
+      / | \
+    o---+---o
+    |  {v}  |   infra-contract
+    o---+---o
+      \ | /
+        o
+
+Thanks for using infra-contract!
+If it helps you, a GitHub star or feedback would be much appreciated.
+Star: https://github.com/khaleddeissa/infra-contract
+Feedback: https://github.com/khaleddeissa/infra-contract/issues
+```
+
+The text logo represents the README SVG's infrastructure nodes, hexagon, code braces,
+and checkmark (`v`). CLI help also includes this message. Interactive commands print it
+once per process on terminal stderr; set `INFRA_CONTRACT_NO_BANNER=1` to silence the
+automatic message. Redirected stderr and the MCP server stay quiet, and JSON results
+remain on stdout.
