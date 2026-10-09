@@ -1,9 +1,10 @@
 [project]
 name = "infra-contract"
-version = "0.1.4"
+version = "0.1.5"
 description = "Infrastructure contracts for humans and AI agents."
 readme = "README.md"
 requires-python = ">=3.10"
+authors = [{ name = "Khaled Eissa" }]
 license = "Apache-2.0"
 license-files = ["LICENSE"]
 keywords = ["infrastructure", "terraform", "opentofu", "policy", "ai", "mcp"]

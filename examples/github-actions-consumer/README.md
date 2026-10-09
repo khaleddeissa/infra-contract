@@ -32,7 +32,7 @@ jobs:
           terraform show -json tfplan > plan.json
 
       - name: Validate infrastructure
-        uses: khaleddeissa/infra-contract@v0.1.0
+        uses: khaleddeissa/infra-contract@v0.1.5
         with:
           contract: infra-contract.yaml
           plan: plan.json
@@ -59,7 +59,7 @@ jobs:
 ```yaml
 - name: Validate infrastructure
   id: contract
-  uses: khaleddeissa/infra-contract@v0.1.0
+  uses: khaleddeissa/infra-contract@v0.1.5
   with:
     plan: plan.json
 

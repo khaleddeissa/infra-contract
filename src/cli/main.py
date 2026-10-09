@@ -3,6 +3,7 @@ from __future__ import annotations
 import typer
 
 from cli.check import run_check
+from cli.community import COMMUNITY_MESSAGE, show_community_message
 from cli.explain import run_explain
 from cli.fix import run_fix
 from cli.init_cmd import run_init
@@ -12,7 +13,21 @@ app = typer.Typer(
     name="infra-contract",
     help="Infrastructure contracts for humans and AI agents.",
     no_args_is_help=True,
+    epilog=COMMUNITY_MESSAGE,
 )
+
+
+@app.callback()
+def main(ctx: typer.Context) -> None:
+    """Show a brief thank-you for interactive CLI use."""
+    if ctx.invoked_subcommand not in {"mcp", "support"}:
+        show_community_message()
+
+
+@app.command()
+def support() -> None:
+    """Print the project logo and links to star the repository or share feedback."""
+    typer.echo(COMMUNITY_MESSAGE)
 
 
 @app.command()
